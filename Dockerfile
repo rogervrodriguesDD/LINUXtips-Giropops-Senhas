@@ -5,10 +5,8 @@ COPY . /giropops-senhas
 
 ENV VIRTUAL_ENV=/giropops-senhas/.venv
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
-EXPOSE 80
 
-RUN apt-get update \
-  && apt-get install pip -y \
+RUN apt-get install pip -y \
   && python3 -m venv $VIRTUAL_ENV
 
 RUN pip install --user --no-cache-dir -r requirements.txt
@@ -20,5 +18,6 @@ ENV VIRTUAL_ENV=/giropops-senhas/.venv
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 COPY --from=build /giropops-senhas/ /giropops-senhas/
 
+EXPOSE 80
 ENTRYPOINT ["flask", "run"]
 CMD ["--host", "0.0.0.0", "--port", "80"]
