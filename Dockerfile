@@ -1,4 +1,4 @@
-FROM python:3.10.14-slim as build
+FROM cgr.dev/chainguard/python:latest-dev as build
 
 WORKDIR giropops-senhas
 COPY . /giropops-senhas
@@ -6,12 +6,10 @@ COPY . /giropops-senhas
 ENV VIRTUAL_ENV=/giropops-senhas/.venv
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
-RUN apt-get install pip -y \
-  && python3 -m venv $VIRTUAL_ENV
+RUN python3 -m venv $VIRTUAL_ENV
+RUN pip install --no-cache-dir -r requirements.txt
 
-RUN pip install --user --no-cache-dir -r requirements.txt
-
-FROM python:3.10.14-slim
+FROM cgr.dev/chainguard/python:latest
 WORKDIR giropops-senhas
 ENV REDIS_HOST="gpops-redis-service"  
 ENV VIRTUAL_ENV=/giropops-senhas/.venv
