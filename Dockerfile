@@ -1,14 +1,24 @@
-FROM python:3.10.14-slim
+FROM python:3.10.14-slim as build
 
 WORKDIR giropops-senhas
-ADD . /giropops-senhas
+COPY . /giropops-senhas
 
-ENV REDIS_HOST="gpops-redis-service"  
+ENV VIRTUAL_ENV=/giropops-senhas/.venv
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 EXPOSE 80
 
 RUN apt-get update \
   && apt-get install pip -y \
-  && pip install --no-cache-dir -r requirements.txt
+  && python3 -m venv $VIRTUAL_ENV
+
+RUN pip install --user --no-cache-dir -r requirements.txt
+
+FROM python:3.10.14-slim
+WORKDIR giropops-senhas
+ENV REDIS_HOST="gpops-redis-service"  
+ENV VIRTUAL_ENV=/giropops-senhas/.venv
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+COPY --from=build /giropops-senhas/ /giropops-senhas/
 
 ENTRYPOINT ["flask", "run"]
 CMD ["--host", "0.0.0.0", "--port", "80"]
